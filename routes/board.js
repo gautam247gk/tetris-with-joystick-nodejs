@@ -1,6 +1,6 @@
-
 module.exports = {
-  index: function(req, res, next) {
-    res.render('boards/index');
-  }
+  index: function (req, res, next) {
+    res.render("boards/index");
+  },
 };
+//

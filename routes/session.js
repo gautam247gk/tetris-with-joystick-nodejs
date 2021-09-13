@@ -1,14 +1,14 @@
 module.exports = {
-  new: function(req, res, next) {
-    res.render('session/new');
+  new: function (req, res, next) {
+    res.render("session/new");
   },
 
-  create: function(req, res, next) {
+  create: function (req, res, next) {
     // Sign in
     req.session.user = { name: req.body.name };
-    res.redirect('/board');
+    res.redirect("/board");
   },
 
-  delete: function(req, res, next) {
-  }
+  delete: function (req, res, next) {},
 };
+//
