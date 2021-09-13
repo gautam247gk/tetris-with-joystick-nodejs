@@ -1,6 +1,17 @@
-### Makers Academy Node Workshop
+### Tetris with arduino and joystick using johnny five
 
 To run this project, do the following:
+
+Connect your arduino board to the usb port.
+Go to Tools -> Board and make sure the device you have is correctly selected.
+Then go to File -> Examples -> Firmata and choose StandardFirmataPlus
+Click the right arrow icon on the toolbar to compile and load the program on the Arduino board:
+connect 4 wires to the joystick and Make sure the pins in the joystick are as follows :
+
+1. Connect pin #1 and #2 to GND and +5V.
+2. Pin #3 (x) goes to A0 and pin #4 (y) goes to A1.
+
+Now run the following commands
 
 ```
 npm install
@@ -8,32 +19,3 @@ npm start
 ```
 
 Then visit <http://localhost:3000> in a browser.
-
-#### Resources
-
-Slides:
-  http://bit.ly/ma-node-slides
-
-Node and Express documentation:
-  http://nodejs.org/docs/latest/api/all.html
-  http://expressjs.com/api.html
-
-JavaScript documentation:
-  http://devdocs.io/
-  https://developer.mozilla.org/en/docs/Web/JavaScript
-
-Bootstrap:
-  http://getbootstrap.com/ 
-
-### Tetris tasks
-
-* [Client-side] Add Bootstrap so the UI looks nicer
-* [Client, server] Pause game
-* [Server-side, logic] Increase the speed as the score increases
-* [Client and server] Show the scoreboard on the main game web view
-- Add an API method that returns the score board JSON
-- Load that JSON in jQuery and generate HTML for it
-* [Client, SVG/D3] Show the "ghost" of where the current piece will fall
-* [Client, server] Allow a key to be pressed to immediately make the piece drop down
-* Your own feature: Powerups, multiplayer, etc.
-
