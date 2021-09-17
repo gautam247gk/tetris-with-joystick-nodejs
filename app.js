@@ -126,30 +126,26 @@ webSocketServer.on("connection", function (ws) {
     clearInterval(boardUpdateId);
   });
   //<--------------------------------->
-  board.on("ready", () => {
-    const joystick = new Joystick({
-      pins: ["A0", "A1"],
-    });
-    joystick.on("change", function () {
-      if (this.x > 0.5) {
-        console.log("->");
-        move = "right"; //right
-      }
-      if (this.x < -0.5) {
-        console.log("<-");
-        move = "left"; //left
-      }
+  port.on("data", function (data) {
+    console.log("Data:", data);
+    if (data == "r") {
+      console.log("->");
+      move = "right"; //right
+    }
+    if (data == "l") {
+      console.log("<-");
+      move = "left"; //left
+    }
 
-      if (this.y > 0.5) {
-        console.log("down"); //down
-        move = "down";
-      }
-      if (this.y < -0.5) {
-        console.log("up");
-        move = "rotate"; //rotate
-      }
-      handleMove(ws, Tboard, move);
-    });
+    if (data == "d") {
+      console.log("down"); //down
+      move = "down";
+    }
+    if (data == "rt") {
+      console.log("up");
+      move = "rotate"; //rotate
+    }
+    handleMove(ws, Tboard, move);
   });
   //
   ws.on("message", function (data, flags) {
