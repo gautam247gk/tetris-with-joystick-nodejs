@@ -12,8 +12,11 @@ var speed = 310;
 var store = new MemoryStore();
 var WebSocketServer = require("ws").Server;
 var webSocketServer;
-const { Board, Joystick } = require("johnny-five");
-const board = new Board();
+
+const SerialPort = require("serialport");
+const port = new SerialPort("/dev/tty-usbserial1", {
+  baudRate: 15200,
+});
 
 app.set("view engine", "ejs");
 
