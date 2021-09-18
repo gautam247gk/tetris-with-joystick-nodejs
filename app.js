@@ -93,6 +93,7 @@ webSocketServer.on("connection", function (ws) {
   });
 
   port.on("data", function (data) {
+    console.log(data);
     if (data == "ok") {
       var Tboard = new TBoard(14, 20);
       var boardUpdateId;
@@ -157,7 +158,7 @@ webSocketServer.on("connection", function (ws) {
           move = "down";
         }
         if (data == "rt") {
-          console.log("up");
+          console.log("up/rotate");
           move = "rotate"; //rotate
         }
         handleMove(ws, Tboard, move);
