@@ -93,6 +93,7 @@ webSocketServer.on("connection", function (ws) {
   });
 
   port.on("data", function (data) {
+    data = data.toString("utf-8");
     console.log(data);
     if (data == "ok") {
       var Tboard = new TBoard(14, 20);
@@ -143,6 +144,7 @@ webSocketServer.on("connection", function (ws) {
       });
       //<--------------------------------->joystick
       port.on("data", function (data) {
+        data = data.toString("utf-8");
         console.log("Data:", data);
         if (data == "r") {
           console.log("->");

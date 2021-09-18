@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/.bin/nodemon app.js"
+    "start": "node app.js"
   },
   "author": "Alex R. Young",
   "license": "MIT",
@@ -17,7 +17,6 @@
     "ws": "^0.4.31"
   },
   "devDependencies": {
-    "mocha": "^1.17.1",
-    "nodemon": "^1.0.15"
+    "mocha": "^1.17.1"
   }
 }
