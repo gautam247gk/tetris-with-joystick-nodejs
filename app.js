@@ -86,83 +86,93 @@ function handleMove(ws, board, move) {
 
 webSocketServer.on("connection", function (ws) {
   // TODO: I might move this
-  var Tboard = new TBoard(14, 20);
-  var boardUpdateId;
-
-  sendBoard(ws, Tboard);
-
-  Tboard.on("shape", function () {
-    sendBoard(ws, Tboard);
+  port.write("start", function (err) {
+    if (err) {
+      return console.log("Error on write: ", err.message);
+    }
   });
 
-  Tboard.on("score", function (score) {
-    ws.send(JSON.stringify({ type: "score", value: score }));
-  });
+  port.on(data, function (data) {
+    if (data == "ok") {
+      var Tboard = new TBoard(14, 20);
+      var boardUpdateId;
 
-  Tboard.on("gameover", function () {
-    parseCookie(ws.upgradeReq, null, function (err) {
-      var sid = ws.upgradeReq.signedCookies["connect.sid"];
+      sendBoard(ws, Tboard);
 
-      store.get(sid, function (err, session) {
-        if (err) console.error("Error loading session:", err);
-        scores.save(
-          { name: session.user.name, score: board.score },
-          function (err) {
-            if (err) console.error("Error saving score:", err);
-            ws.send(JSON.stringify({ type: "gameover" }));
-          }
-        );
+      Tboard.on("shape", function () {
+        sendBoard(ws, Tboard);
       });
-    });
-  });
 
-  Tboard.on("nextshape", function (shape) {
-    sendShape(ws, shape, "nextshape");
-  });
+      Tboard.on("score", function (score) {
+        ws.send(JSON.stringify({ type: "score", value: score }));
+      });
 
-  sendShape(ws, Tboard.nextShape, "nextshape");
+      Tboard.on("gameover", function () {
+        parseCookie(ws.upgradeReq, null, function (err) {
+          var sid = ws.upgradeReq.signedCookies["connect.sid"];
 
-  boardUpdateId = setInterval(function () {
-    if (!Tboard.running) return;
+          store.get(sid, function (err, session) {
+            if (err) console.error("Error loading session:", err);
+            scores.save(
+              { name: session.user.name, score: board.score },
+              function (err) {
+                if (err) console.error("Error saving score:", err);
+                ws.send(JSON.stringify({ type: "gameover" }));
+              }
+            );
+          });
+        });
+      });
 
-    Tboard.currentShape.moveDown();
-    sendShape(ws, Tboard.currentShape, "shape");
-  }, speed);
+      Tboard.on("nextshape", function (shape) {
+        sendShape(ws, shape, "nextshape");
+      });
 
-  ws.on("close", function () {
-    clearInterval(boardUpdateId);
-  });
-  //<--------------------------------->joystick
-  port.on("data", function (data) {
-    console.log("Data:", data);
-    if (data == "r") {
-      console.log("->");
-      move = "right"; //right
-    }
-    if (data == "l") {
-      console.log("<-");
-      move = "left"; //left
-    }
+      sendShape(ws, Tboard.nextShape, "nextshape");
 
-    if (data == "d") {
-      console.log("down"); //down
-      move = "down";
-    }
-    if (data == "rt") {
-      console.log("up");
-      move = "rotate"; //rotate
-    }
-    handleMove(ws, Tboard, move);
-    port.write("ok");
-  });
-  //
-  ws.on("message", function (data) {
-    var message = JSON.parse(data);
+      boardUpdateId = setInterval(function () {
+        if (!Tboard.running) return;
 
-    if (message.type === "move") {
-      handleMove(ws, Tboard, message.move);
-    } else {
-      ws.send("Unknown command");
+        Tboard.currentShape.moveDown();
+        sendShape(ws, Tboard.currentShape, "shape");
+      }, speed);
+
+      ws.on("close", function () {
+        clearInterval(boardUpdateId);
+      });
+      //<--------------------------------->joystick
+      port.on("data", function (data) {
+        console.log("Data:", data);
+        if (data == "r") {
+          console.log("->");
+          move = "right"; //right
+        }
+        if (data == "l") {
+          console.log("<-");
+          move = "left"; //left
+        }
+
+        if (data == "d") {
+          console.log("down"); //down
+          move = "down";
+        }
+        if (data == "rt") {
+          console.log("up");
+          move = "rotate"; //rotate
+        }
+        handleMove(ws, Tboard, move);
+        port.write("ok");
+      });
+      //
+      ws.on("message", function (data) {
+        var message = JSON.parse(data);
+
+        if (message.type === "move") {
+          handleMove(ws, Tboard, message.move);
+        } else {
+          ws.send("Unknown command");
+        }
+      });
     }
   });
 });
