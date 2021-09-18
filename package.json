@@ -12,7 +12,6 @@
   "dependencies": {
     "ejs": "^0.8.5",
     "express": "^3.4.8",
-    "johnny-five": "^2.1.0",
     "serialport": "^9.2.1",
     "sirtet": "0.0.4",
     "ws": "^0.4.31"

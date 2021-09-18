@@ -12,10 +12,14 @@ var speed = 310;
 var store = new MemoryStore();
 var WebSocketServer = require("ws").Server;
 var webSocketServer;
-
+var portid = require("./portid");
 const SerialPort = require("serialport");
-const port = new SerialPort("/dev/tty-usbserial1", {
-  baudRate: 15200,
+const port = new SerialPort(portid.port, {
+  baudRate: 9600,
+  dataBits: 8,
+  parity: "none",
+  stopBits: 1,
+  flowControl: false,
 });
 
 app.set("view engine", "ejs");
@@ -128,7 +132,7 @@ webSocketServer.on("connection", function (ws) {
   ws.on("close", function () {
     clearInterval(boardUpdateId);
   });
-  //<--------------------------------->
+  //<--------------------------------->joystick
   port.on("data", function (data) {
     console.log("Data:", data);
     if (data == "r") {
@@ -149,9 +153,10 @@ webSocketServer.on("connection", function (ws) {
       move = "rotate"; //rotate
     }
     handleMove(ws, Tboard, move);
+    port.write("ok");
   });
   //
-  ws.on("message", function (data, flags) {
+  ws.on("message", function (data) {
     var message = JSON.parse(data);
 
     if (message.type === "move") {
