@@ -92,7 +92,7 @@ webSocketServer.on("connection", function (ws) {
     }
   });
 
-  port.on(data, function (data) {
+  port.on("data", function (data) {
     if (data == "ok") {
       var Tboard = new TBoard(14, 20);
       var boardUpdateId;
