@@ -105,31 +105,27 @@ webSocketServer.on("connection", function (ws) {
     sendBoard(ws, Tboard);
   });
   port.on("data", async function (data) {
-    data = await data.toString("utf-8");
+    data = await data.toString("utf-8").trim();
     console.log(typeof data);
     console.log("movement from esp32:", data);
     if (data == "ok") {
       port.write("ok", function () {
         console.log("writing second ok to esp32");
       });
-    }
-    if (data === "r".toString()) {
+    } else if (data == "r") {
       console.log("->");
       move = "right"; //right
       handleMove(ws, Tboard, move);
-    }
-    if (data === "l") {
+    } else if (data == "l") {
       console.log("<-");
       move = "left"; //left
       handleMove(ws, Tboard, move);
-    }
-
-    if (data === "d") {
+    } else if (data == "d") {
       console.log("down"); //down
       move = "down";
       handleMove(ws, Tboard, move);
     }
-    if (data === "rt") {
+    if (data == "rt") {
       console.log("up/rotate");
       move = "rotate"; //rotate
       handleMove(ws, Tboard, move);
@@ -143,6 +139,7 @@ webSocketServer.on("connection", function (ws) {
   });
 
   Tboard.on("gameover", function () {
+    port.write("stop");
     parseCookie(ws.upgradeReq, null, function (err) {
       var sid = ws.upgradeReq.signedCookies["connect.sid"];
 
