@@ -106,31 +106,35 @@ webSocketServer.on("connection", function (ws) {
   });
   port.on("data", async function (data) {
     data = await data.toString("utf-8");
+    console.log(typeof data);
     console.log("movement from esp32:", data);
     if (data == "ok") {
       port.write("ok", function () {
         console.log("writing second ok to esp32");
       });
     }
-    if (data == "r") {
+    if (data === "r".toString()) {
       console.log("->");
       move = "right"; //right
+      handleMove(ws, Tboard, move);
     }
-    if (data == "l") {
+    if (data === "l") {
       console.log("<-");
       move = "left"; //left
+      handleMove(ws, Tboard, move);
     }
 
-    if (data == "d") {
+    if (data === "d") {
       console.log("down"); //down
       move = "down";
+      handleMove(ws, Tboard, move);
     }
-    if (data == "rt") {
+    if (data === "rt") {
       console.log("up/rotate");
       move = "rotate"; //rotate
+      handleMove(ws, Tboard, move);
     }
 
-    handleMove(ws, Tboard, move);
     port.write("ok");
   });
 
@@ -145,7 +149,7 @@ webSocketServer.on("connection", function (ws) {
       store.get(sid, function (err, session) {
         if (err) console.error("Error loading session:", err);
         scores.save(
-          { name: session.user.name, score: board.score },
+          { name: session.user.name, score: Tboard.score },
           function (err) {
             if (err) console.error("Error saving score:", err);
             ws.send(JSON.stringify({ type: "gameover" }));
@@ -172,33 +176,33 @@ webSocketServer.on("connection", function (ws) {
     clearInterval(boardUpdateId);
   });
   //<--------------------------------->joystick
-  port.write("ok", function () {
-    console.log("writing first ok");
-  });
-  port.on("data", async function (data) {
-    data = await data.toString("utf-8");
-    console.log("movement:", data);
-    if (data == "r") {
-      console.log("->");
-      move = "right"; //right
-    }
-    if (data == "l") {
-      console.log("<-");
-      move = "left"; //left
-    }
+  // port.write("ok", function () {
+  //   console.log("writing first ok");
+  // });
+  // port.on("data", async function (data) {
+  //   data = await data.toString("utf-8");
+  //   console.log("movement:", data);
+  //   if (data == "r") {
+  //     console.log("->");
+  //     move = "right"; //right
+  //   }
+  //   if (data == "l") {
+  //     console.log("<-");
+  //     move = "left"; //left
+  //   }
 
-    if (data == "d") {
-      console.log("down"); //down
-      move = "down";
-    }
-    if (data == "rt") {
-      console.log("up/rotate");
-      move = "rotate"; //rotate
-    }
+  //   if (data == "d") {
+  //     console.log("down"); //down
+  //     move = "down";
+  //   }
+  //   if (data == "rt") {
+  //     console.log("up/rotate");
+  //     move = "rotate"; //rotate
+  //   }
 
-    handleMove(ws, Tboard, move);
-    port.write("ok");
-  });
+  //   handleMove(ws, Tboard, move);
+  //   port.write("ok");
+  // });
   //
   ws.on("message", function (data) {
     var message = JSON.parse(data);
