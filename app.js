@@ -87,6 +87,7 @@ function handleMove(ws, board, move) {
 webSocketServer.on("connection", function (ws) {
   // TODO: I might move this
   port.write("start", function (err) {
+    console.log("writing start");
     if (err) {
       return console.log("Error on write: ", err.message);
     }
@@ -96,9 +97,35 @@ webSocketServer.on("connection", function (ws) {
   var boardUpdateId;
 
   sendBoard(ws, Tboard);
-
+  port.write("ok", function () {
+    console.log("writing first ok");
+  });
   Tboard.on("shape", function () {
     sendBoard(ws, Tboard);
+  });
+  port.on("data", async function (data) {
+    data = await data.toString("utf-8");
+    console.log("movement:", data);
+    if (data == "r") {
+      console.log("->");
+      move = "right"; //right
+    }
+    if (data == "l") {
+      console.log("<-");
+      move = "left"; //left
+    }
+
+    if (data == "d") {
+      console.log("down"); //down
+      move = "down";
+    }
+    if (data == "rt") {
+      console.log("up/rotate");
+      move = "rotate"; //rotate
+    }
+
+    handleMove(ws, Tboard, move);
+    port.write("ok");
   });
 
   Tboard.on("score", function (score) {
@@ -139,7 +166,9 @@ webSocketServer.on("connection", function (ws) {
     clearInterval(boardUpdateId);
   });
   //<--------------------------------->joystick
-  port.write("ok");
+  port.write("ok", function () {
+    console.log("writing first ok");
+  });
   port.on("data", async function (data) {
     data = await data.toString("utf-8");
     console.log("movement:", data);
