@@ -195,6 +195,8 @@ var store = new MemoryStore();
 var WebSocketServer = require("ws").Server;
 var webSocketServer;
 var portid = require("./portid");
+const MockBinding = require("@serialport/binding-mock");
+//MockBinding.createPort("/dev/robot", { echo: true, record: true });
 const SerialPort = require("serialport");
 const port = new SerialPort(portid.port, {
   baudRate: 9600,
@@ -275,6 +277,8 @@ webSocketServer.on("connection", function (ws) {
       return console.log("Error on write: ", err.message);
     }
   });
+  //MockBinding.read(mock);
+  //console.log("mock read:", mock);
   sendBoard(ws, board);
 
   board.on("shape", function () {
@@ -318,8 +322,9 @@ webSocketServer.on("connection", function (ws) {
   ws.on("close", function () {
     clearInterval(boardUpdateId);
   });
+  //MockBinding.write("ok");
   port.on("data", function (data) {
-    console.log("ok");
+    console.log(data);
     data = data.toString("utf-8");
     console.log(data);
     if (data == "r") {
