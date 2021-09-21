@@ -85,9 +85,10 @@ function handleMove(ws, board, move) {
 }
 
 webSocketServer.on("connection", function (ws) {
+  console.log("new client connected");
   // TODO: I might move this
   port.write("start", function (err) {
-    console.log("writing start");
+    console.log("writing start to esp32");
     if (err) {
       return console.log("Error on write: ", err.message);
     }
@@ -96,7 +97,7 @@ webSocketServer.on("connection", function (ws) {
   var Tboard = new TBoard(14, 20);
   var boardUpdateId;
   port.write("ok", function () {
-    console.log("writing first ok");
+    console.log("writing first ok to esp32");
   });
   sendBoard(ws, Tboard);
 
@@ -105,7 +106,12 @@ webSocketServer.on("connection", function (ws) {
   });
   port.on("data", async function (data) {
     data = await data.toString("utf-8");
-    console.log("movement:", data);
+    console.log("movement from esp32:", data);
+    if (data == "ok") {
+      port.write("ok", function () {
+        console.log("writing second ok to esp32");
+      });
+    }
     if (data == "r") {
       console.log("->");
       move = "right"; //right
