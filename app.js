@@ -95,11 +95,11 @@ webSocketServer.on("connection", function (ws) {
 
   var Tboard = new TBoard(14, 20);
   var boardUpdateId;
-
-  sendBoard(ws, Tboard);
   port.write("ok", function () {
     console.log("writing first ok");
   });
+  sendBoard(ws, Tboard);
+
   Tboard.on("shape", function () {
     sendBoard(ws, Tboard);
   });
