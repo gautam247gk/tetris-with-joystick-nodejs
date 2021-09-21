@@ -270,7 +270,11 @@ webSocketServer.on("connection", function (ws) {
   // TODO: I might move this
   var board = new Board(14, 20);
   var boardUpdateId;
-
+  port.write("start", function (err) {
+    if (err) {
+      return console.log("Error on write: ", err.message);
+    }
+  });
   sendBoard(ws, board);
 
   board.on("shape", function () {
@@ -315,6 +319,7 @@ webSocketServer.on("connection", function (ws) {
     clearInterval(boardUpdateId);
   });
   port.on("data", function (data) {
+    console.log("ok");
     data = data.toString("utf-8");
     console.log(data);
     if (data == "r") {
