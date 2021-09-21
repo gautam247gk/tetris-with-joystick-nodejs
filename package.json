@@ -10,7 +10,6 @@
   "author": "Alex R. Young",
   "license": "MIT",
   "dependencies": {
-    "@serialport/binding-mock": "^9.0.7",
     "ejs": "^0.8.5",
     "express": "^3.4.8",
     "serialport": "^9.2.1",
