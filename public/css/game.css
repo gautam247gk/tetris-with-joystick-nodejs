@@ -1,4 +1,5 @@
-#nextshape svg, #board svg {
+#nextshape svg,
+#board svg {
   background-color: #000;
   float: left;
 }
@@ -10,4 +11,9 @@
 #status {
   font-weight: bold;
   color: red;
+}
+
+.content {
+  max-width: 500px;
+  margin: auto;
 }

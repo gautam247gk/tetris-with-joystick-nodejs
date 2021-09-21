@@ -33,7 +33,7 @@ app.use(express.static(__dirname + "/public"));
 // Sessions
 app.get("/session/new", routes.session.new);
 app.post("/session", routes.session.create);
-app.del("/session", routes.session.delete);
+app.delete("/session", routes.session.delete);
 
 // Scores
 app.get("/scores", routes.scores.index);
@@ -139,7 +139,6 @@ webSocketServer.on("connection", function (ws) {
   });
 
   Tboard.on("gameover", function () {
-    port.write("stop");
     parseCookie(ws.upgradeReq, null, function (err) {
       var sid = ws.upgradeReq.signedCookies["connect.sid"];
 
@@ -150,6 +149,9 @@ webSocketServer.on("connection", function (ws) {
           function (err) {
             if (err) console.error("Error saving score:", err);
             ws.send(JSON.stringify({ type: "gameover" }));
+            port.write("stop", function () {
+              console.log("writing stop to esp32");
+            });
           }
         );
       });
