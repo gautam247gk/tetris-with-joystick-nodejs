@@ -96,6 +96,7 @@ webSocketServer.on("connection", function (ws) {
     sendBoard(ws, Tboard);
   });
   port.on("data", async function (data) {
+    console.log("raw data from esp32:", data);
     data = await data.toString("utf-8").trim();
     console.log(typeof data);
     console.log("movement from esp32:", data);
