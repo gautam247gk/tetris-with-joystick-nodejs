@@ -110,7 +110,7 @@ webSocketServer.on("connection", function (ws) {
     console.log("movement from esp32:", data);
     if (data == "ok") {
       port.write("ok", function () {
-        console.log("writing second ok to esp32");
+        console.log("received ok from esp32");
       });
     } else if (data == "2") {
       console.log("->");
@@ -126,8 +126,6 @@ webSocketServer.on("connection", function (ws) {
       move = "rotate"; //rotate
       handleMove(ws, Tboard, move);
     }
-
-    port.write("ok");
   });
 
   Tboard.on("score", function (score) {
