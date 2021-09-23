@@ -116,16 +116,12 @@ webSocketServer.on("connection", function (ws) {
       console.log("->");
       move = "right"; //right
       handleMove(ws, Tboard, move);
-    } else if (data == "1") {
+    } else if (data == "0") {
       console.log("<-");
       move = "left"; //left
       handleMove(ws, Tboard, move);
-    } else if (data == "4") {
-      console.log("down"); //down
-      move = "down";
-      handleMove(ws, Tboard, move);
     }
-    if (data == "3") {
+    if (data == "1") {
       console.log("up/rotate");
       move = "rotate"; //rotate
       handleMove(ws, Tboard, move);
