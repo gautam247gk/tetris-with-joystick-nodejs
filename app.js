@@ -87,18 +87,9 @@ function handleMove(ws, board, move) {
 webSocketServer.on("connection", function (ws) {
   console.log("new client connected");
   // TODO: I might move this
-  port.write("start", function (err) {
-    console.log("writing start to esp32");
-    if (err) {
-      return console.log("Error on write: ", err.message);
-    }
-  });
-
   var Tboard = new TBoard(14, 20);
   var boardUpdateId;
-  port.write("ok", function () {
-    console.log("writing first ok to esp32");
-  });
+
   sendBoard(ws, Tboard);
 
   Tboard.on("shape", function () {
