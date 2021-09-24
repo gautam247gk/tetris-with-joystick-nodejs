@@ -10,7 +10,7 @@
   "dependencies": {
     "ejs": "^0.8.5",
     "express": "^3.4.8",
-    "serialport": "^9.2.1",
+    "serialport": "^9.2.3",
     "sirtet": "0.0.4",
     "ws": "^0.4.31"
   },

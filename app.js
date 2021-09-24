@@ -12,14 +12,31 @@ var speed = 310;
 var store = new MemoryStore();
 var WebSocketServer = require("ws").Server;
 var webSocketServer;
-var portid = require("./portid");
+const Readline = require('@serialport/parser-readline')
 const SerialPort = require("serialport");
-const port = new SerialPort(portid.port, {
-  baudRate: 115200,
-  dataBits: 8,
-  parity: "none",
-  stopBits: 1,
-  flowControl: false,
+var comport;
+var port;
+var parser;
+SerialPort.list().then(function (ports) {
+  ports.forEach(function (ports) {
+    if (ports.pnpId.includes("VID_10C4&PID_EA60")) {
+      comport = ports.path;
+      console.log("detected comport:", comport);
+      port = new SerialPort(comport, {
+        baudRate: 115200,
+        dataBits: 8,
+        parity: "none",
+        stopBits: 1,
+        flowControl: false,
+      });
+       parser = port.pipe(new Readline({ delimiter: '\r\n' }))
+
+    }
+  });
+  if (!port) {
+    console.log("PlayComputer not connected");
+    process.exit(1);
+  }
 });
 
 app.set("view engine", "ejs");
@@ -95,25 +112,23 @@ webSocketServer.on("connection", function (ws) {
   Tboard.on("shape", function () {
     sendBoard(ws, Tboard);
   });
-  port.on("data", async function (data) {
-    console.log("raw data from esp32:", data);
+  parser.on("data", async function (data) {
     data = await data.toString("utf-8").trim();
-    console.log(typeof data);
-    console.log("movement from esp32:", data);
+    console.log("movement bit from esp32:", data);
     if (data == "ok") {
       port.write("ok", function () {
         console.log("received ok from esp32");
       });
-    } else if (data == "2") {
+    } else if (data == "50") {
       console.log("->");
       move = "right"; //right
       handleMove(ws, Tboard, move);
-    } else if (data == "0") {
+    } else if (data == "48") {
       console.log("<-");
       move = "left"; //left
       handleMove(ws, Tboard, move);
     }
-    if (data == "1") {
+    if (data == "49") {
       console.log("up/rotate");
       move = "rotate"; //rotate
       handleMove(ws, Tboard, move);
@@ -135,9 +150,7 @@ webSocketServer.on("connection", function (ws) {
           function (err) {
             if (err) console.error("Error saving score:", err);
             ws.send(JSON.stringify({ type: "gameover" }));
-            port.write("stop", function () {
-              console.log("writing stop to esp32");
-            });
+            
           }
         );
       });
