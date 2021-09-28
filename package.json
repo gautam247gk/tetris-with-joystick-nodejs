@@ -10,11 +10,11 @@
   "dependencies": {
     "ejs": "^0.8.5",
     "express": "^3.4.8",
+    "method-override": "^3.0.0",
     "serialport": "^9.2.3",
     "sirtet": "0.0.4",
     "ws": "^0.4.31"
   },
- 
   "devDependencies": {
     "mocha": "^1.17.1"
   }

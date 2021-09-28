@@ -13,10 +13,10 @@
   color: red;
 }
 :root {
-	--feedback-primary-color: #53488d;
+  --feedback-primary-color: #2e2b2b;
 }
 .button {
-  background-color: #4CAF50; /* Green */
+  background-color: #4caf50; /* Green */
   border: none;
   color: white;
   padding: 15px 32px;
@@ -28,9 +28,11 @@
 
 body {
   font-family: "DM Sans", sans-serif;
-	background-color: var(--feedback-primary-color);
+  background-color: var(--feedback-primary-color);
 }
-.score {color: white;}
+.score {
+  color: white;
+}
 .content {
   max-width: 500px;
   margin: auto;

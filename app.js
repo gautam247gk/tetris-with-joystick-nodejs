@@ -1,48 +1,49 @@
 var express = require("express");
+var methodOverride = require("method-override");
 var app = express();
 var TBoard = require("sirtet").Board;
 var parseCookie = express.cookieParser("some secret");
 var MemoryStore = express.session.MemoryStore;
 var middleware = require("./middleware");
 var routes = require("./routes");
-var server = app.listen(process.env.PORT || 3000);
-var Scores = require("./scores");
-var scores = new Scores();
+var server = app.listen(3000);
 var speed = 310;
 var store = new MemoryStore();
 var WebSocketServer = require("ws").Server;
 var webSocketServer;
-const Readline = require('@serialport/parser-readline')
+const Readline = require("@serialport/parser-readline");
 const SerialPort = require("serialport");
 var comport;
 var port;
 var parser;
+var newport;
 SerialPort.list().then(function (ports) {
   ports.forEach(function (ports) {
-    if (ports.pnpId.includes("VID_10C4&PID_EA60")) {
+    if (
+      ports.pnpId.includes("VID_10C4&PID_EA60") ||
+      ports.pnpId.includes("VID_1A86&PID_7523")
+    ) {
       comport = ports.path;
-      console.log("detected comport:", comport);
-      port = new SerialPort(comport, {
+      console.log("PlayComputer Connected at :", comport);
+      console.log("Visit 'http://localhost:3000' on your browser");
+      newport = new SerialPort(comport, {
         baudRate: 115200,
         dataBits: 8,
         parity: "none",
         stopBits: 1,
         flowControl: false,
       });
-       parser = port.pipe(new Readline({ delimiter: '\r\n' }))
-
+      parser = newport.pipe(new Readline({ delimiter: "\r\n" }));
     }
   });
-  if (!port) {
-    console.log("PlayComputer not connected");
-    process.exit(1);
+  if (!newport) {
+    console.log("PlayComputer not connected \nConnect and reopen again");
   }
 });
-
 app.set("view engine", "ejs");
 
-app.use(express.bodyParser({ keepExtensions: true, uploadDir: "/tmp" }));
-app.use(express.methodOverride());
+app.use(express.json({ keepExtensions: true, uploadDir: "/tmp" }));
+app.use(methodOverride());
 app.use(parseCookie);
 app.use(express.session({ store: store, secret: "some secret" }));
 app.use(express.static(__dirname + "/public"));
@@ -51,9 +52,6 @@ app.use(express.static(__dirname + "/public"));
 app.get("/session/new", routes.session.new);
 app.post("/session", routes.session.create);
 app.delete("/session", routes.session.delete);
-
-// Scores
-app.get("/scores", routes.scores.index);
 
 // Game
 app.get("/", middleware.requiresUser, routes.board.index);
@@ -114,47 +112,35 @@ webSocketServer.on("connection", function (ws) {
   });
   parser.on("data", async function (data) {
     data = await data.toString("utf-8").trim();
-    console.log("movement bit from esp32:", data);
+    //console.log("movement bit from esp32:", data);
     if (data == "ok") {
-      port.write("ok", function () {
-        console.log("received ok from esp32");
+      parser.write("ok", function () {
+        // console.log("received ok from esp32");
       });
     } else if (data == "50") {
-      console.log("->");
+      // console.log("->");
       move = "right"; //right
-      handleMove(ws, Tboard, move);
+      try {
+        handleMove(ws, Tboard, move);
+      } catch (err) {}
     } else if (data == "48") {
-      console.log("<-");
+      //console.log("<-");
       move = "left"; //left
-      handleMove(ws, Tboard, move);
+      try {
+        handleMove(ws, Tboard, move);
+      } catch (err) {}
     }
     if (data == "49") {
-      console.log("up/rotate");
+      //console.log("up/rotate");
       move = "rotate"; //rotate
-      handleMove(ws, Tboard, move);
+      try {
+        handleMove(ws, Tboard, move);
+      } catch (err) {}
     }
-  });
-
-  Tboard.on("score", function (score) {
-    ws.send(JSON.stringify({ type: "score", value: score }));
   });
 
   Tboard.on("gameover", function () {
-    parseCookie(ws.upgradeReq, null, function (err) {
-      var sid = ws.upgradeReq.signedCookies["connect.sid"];
-
-      store.get(sid, function (err, session) {
-        if (err) console.error("Error loading session:", err);
-        scores.save(
-          { name: session.user.name, score: Tboard.score },
-          function (err) {
-            if (err) console.error("Error saving score:", err);
-            ws.send(JSON.stringify({ type: "gameover" }));
-            
-          }
-        );
-      });
-    });
+    ws.send(JSON.stringify({ type: "gameover" }));
   });
 
   Tboard.on("nextshape", function (shape) {
